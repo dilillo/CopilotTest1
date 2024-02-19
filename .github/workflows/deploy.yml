@@ -1,0 +1,45 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+    - release
+
+env:
+  UNIQUE_APP_NAME: copilottest1
+  AZURE_RESOURCE_GROUP_NAME: copilottest1-rg
+  AZURE_RESOURCE_GROUP_LOCATION: eastus
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET 7.0
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+
+    - name: .NET publish products api
+      run: dotnet publish ./OrleansExample2.Api/OrleansExample2.Api.csproj --configuration Release
+
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Flex bicep
+      run: |
+        az deployment group create \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP_NAME }} \
+          --template-file '.github/workflows/flex/main.bicep' \
+          --parameters location=${{ env.AZURE_RESOURCE_GROUP_LOCATION }} \
+            appName=${{ env.UNIQUE_APP_NAME }}
+
+    - name: Webapp deploy
+      run: |
+        az webapp deploy --name ${{ env.UNIQUE_APP_NAME }} \
+          --resource-group ${{ env.AZURE_RESOURCE_GROUP_NAME  }} \
+          --clean true --restart true \
+          --type zip --src-path ./silo.zip --debug

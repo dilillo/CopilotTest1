@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.1.1" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="7.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CopilotTest1.Domain.Shared\CopilotTest1.Shared.Domain.csproj" />
+    <ProjectReference Include="..\CopilotTest1.EventSourcing\CopilotTest1.Shared.EventSourcing.csproj" />
+  </ItemGroup>
+
+</Project>
